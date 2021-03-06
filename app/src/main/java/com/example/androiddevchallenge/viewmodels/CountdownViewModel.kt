@@ -15,45 +15,50 @@
  */
 package com.example.androiddevchallenge.viewmodels
 
+import android.os.CountDownTimer
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.launch
 
 class CountdownViewModel : ViewModel() {
     var startTime = mutableStateOf(60L)
     val remainingTime = mutableStateOf(60L)
 
-    var running = mutableStateOf(CountdownStatus.STOPPED)
+    var status = mutableStateOf(CountdownStatus.STOPPED)
 
-    private fun isRunning() = running.value == CountdownStatus.RUNNING
+    var countdown: CountDownTimer? = null
 
-    private fun countdown(time: Long): Flow<Long> = flow {
-        for (second in (time) downTo 0) {
-            if (isRunning()) {
-                delay(1000L)
-                emit(second)
+    fun isRunning() = status.value == CountdownStatus.RUNNING
+    fun isStopped() = status.value == CountdownStatus.STOPPED
+    fun isPaused() = status.value == CountdownStatus.PAUSED
+
+    fun startCountdown() {
+        status.value = CountdownStatus.RUNNING
+        countdown = object : CountDownTimer(remainingTime.value * 1000, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                remainingTime.value = millisUntilFinished / 1000
+            }
+
+            override fun onFinish() {
+                stopCountdown()
             }
         }
-    }
-
-    private fun startCountdown() {
-        running.value = CountdownStatus.RUNNING
-        viewModelScope.launch {
-            countdown(startTime.value).collect { remainingSeconds -> remainingTime.value = remainingSeconds }
-        }
+        countdown?.start()
     }
 
     fun stopCountdown() {
-        running.value = CountdownStatus.STOPPED
+        status.value = CountdownStatus.STOPPED
+        countdown?.cancel()
+        remainingTime.value = startTime.value
     }
 
-    private fun pauseCountdown() {
-        running.value = CountdownStatus.PAUSED
+    fun pauseCountdown() {
+        status.value = CountdownStatus.PAUSED
+        countdown?.cancel()
+    }
+
+    fun resumeCountdown() {
+        status.value = CountdownStatus.RUNNING
+        startCountdown()
     }
 
     fun setStartTime(it: String) {
@@ -64,11 +69,11 @@ class CountdownViewModel : ViewModel() {
         }
     }
 
-    fun toggleStartCountdown() {
-        when (running.value) {
-            CountdownStatus.RUNNING -> pauseCountdown()
-            CountdownStatus.PAUSED -> startCountdown()
-            CountdownStatus.STOPPED -> startCountdown()
+    fun setRemainingTime(it: String) {
+        if (it.isEmpty()) {
+            remainingTime.value = 0L
+        } else {
+            remainingTime.value = it.toLong()
         }
     }
 }

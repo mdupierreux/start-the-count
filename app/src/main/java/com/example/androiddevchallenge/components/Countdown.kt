@@ -15,50 +15,28 @@
  */
 package com.example.androiddevchallenge.components
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ProgressIndicatorDefaults
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Pause
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.androiddevchallenge.viewmodels.CountdownStatus
 import com.example.androiddevchallenge.viewmodels.CountdownViewModel
 
 @Composable
 fun CountdownScreen(viewModel: CountdownViewModel = viewModel()) {
-    val remainingTime: Long by viewModel.remainingTime
-    val startTime: Long by viewModel.startTime
-    val status: CountdownStatus by viewModel.running
 
-    val progress by animateFloatAsState(
-        targetValue = remainingTime.toFloat() / startTime,
-        animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec,
-    )
+    val startTime: Long by viewModel.startTime
 
     Column(
         modifier = Modifier
@@ -67,43 +45,19 @@ fun CountdownScreen(viewModel: CountdownViewModel = viewModel()) {
         horizontalAlignment = Alignment.CenterHorizontally,
 
     ) {
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier.padding(vertical = 56.dp)
-        ) {
-
-            CircularProgressIndicator(
-                progress = progress,
-                modifier = Modifier
-                    .width(200.dp)
-                    .height(200.dp)
-                    .padding(16.dp),
-                color = MaterialTheme.colors.primary,
-                strokeWidth = 10.dp
-            )
-            Text(
-                text = remainingTime.toString(),
-                style = TextStyle(fontSize = 24.sp)
-            )
-        }
+        CircularProgress(viewModel = viewModel)
         TextField(
             modifier = Modifier.padding(16.dp),
             value = startTime.toString(),
-            onValueChange = { viewModel.setStartTime(it) },
+            onValueChange = {
+                viewModel.setStartTime(it)
+                viewModel.setRemainingTime(it)
+            },
             label = { Text("Seconds") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            enabled = status != CountdownStatus.RUNNING
+            enabled = viewModel.isStopped()
         )
-        FloatingActionButton(
-
-            onClick = { viewModel.toggleStartCountdown() },
-        ) {
-            if (status != CountdownStatus.RUNNING) {
-                Icon(imageVector = Icons.Filled.PlayArrow, contentDescription = "")
-            } else {
-                Icon(imageVector = Icons.Filled.Pause, contentDescription = "")
-            }
-        }
+        ActionButtons(viewModel = viewModel)
     }
 }
 

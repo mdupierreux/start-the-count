@@ -38,7 +38,7 @@ fun CircularProgress(viewModel: CountdownViewModel) {
     val remainingTime: Long by viewModel.remainingTime
     val startTime: Long by viewModel.startTime
     val progress by animateFloatAsState(
-        targetValue = remainingTime.toFloat() / startTime,
+        targetValue = if (!(remainingTime.toFloat() / startTime).isNaN()) remainingTime.toFloat() / startTime else 1F,
         animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec,
     )
 

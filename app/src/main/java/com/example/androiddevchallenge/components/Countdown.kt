@@ -25,6 +25,9 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
@@ -36,7 +39,7 @@ import com.example.androiddevchallenge.viewmodels.CountdownViewModel
 @Composable
 fun CountdownScreen(viewModel: CountdownViewModel = viewModel()) {
 
-    val startTime: Long by viewModel.startTime
+    var startTime by remember { mutableStateOf("60") }
 
     Column(
         modifier = Modifier
@@ -48,10 +51,11 @@ fun CountdownScreen(viewModel: CountdownViewModel = viewModel()) {
         CircularProgress(viewModel = viewModel)
         TextField(
             modifier = Modifier.padding(16.dp),
-            value = startTime.toString(),
+            value = startTime,
             onValueChange = {
-                viewModel.setStartTime(it)
-                viewModel.setRemainingTime(it)
+                startTime = it
+                viewModel.setRemainingTime(startTime)
+                viewModel.setStartTime(startTime)
             },
             label = { Text("Seconds") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),

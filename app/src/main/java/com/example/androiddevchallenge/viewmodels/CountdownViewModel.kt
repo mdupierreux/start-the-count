@@ -25,7 +25,7 @@ class CountdownViewModel : ViewModel() {
 
     var status = mutableStateOf(CountdownStatus.STOPPED)
 
-    var countdown: CountDownTimer? = null
+    private var countdown: CountDownTimer? = null
 
     fun isRunning() = status.value == CountdownStatus.RUNNING
     fun isStopped() = status.value == CountdownStatus.STOPPED

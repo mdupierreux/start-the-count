@@ -6,12 +6,11 @@
 
 
 ## :scroll: Description
-<!--- Describe your app in one or two sentences -->
-
+This app allow the user to set a countdown for a number of seconds with ability to start / pause / stop it.
 
 ## :bulb: Motivation and Context
-<!--- Optionally point readers to interesting parts of your submission. -->
-<!--- What are you especially proud of? -->
+This app is part of #AndroidDevChallenge. It shows how to use Jetpack Compose to build great UI.
+
 
 
 ## :camera_flash: Screenshots
